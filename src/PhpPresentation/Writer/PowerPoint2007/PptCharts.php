@@ -40,6 +40,7 @@ use PhpOffice\PhpPresentation\Shape\Chart\Type\Pie;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Pie3D;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Radar;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Scatter;
+use PhpOffice\PhpPresentation\Shape\Chart\Type\Bubble;
 use PhpOffice\PhpPresentation\Style\Border;
 use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -525,6 +526,8 @@ class PptCharts extends AbstractDecoratorWriter
             $this->writeTypeRadar($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
         } elseif ($chartType instanceof Scatter) {
             $this->writeTypeScatter($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
+        }  elseif ($chartType instanceof Bubble) {
+            $this->writeTypeBubble($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
         } else {
             throw new UndefinedChartTypeException();
         }
@@ -2203,6 +2206,144 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
     }
 
+     /**
+     * Write Type Bubble
+     *
+     * @param XMLWriter $objWriter
+     * @param Bubble $subject
+     * @param bool $includeSheet
+     */
+    protected function writeTypeBubble(XMLWriter $objWriter, Bubble $subject, bool $includeSheet = false): void
+    {
+        // c:scatterChart
+        $objWriter->startElement('c:bubbleChart');
+
+        // c:varyColors
+        $objWriter->startElement('c:varyColors');
+        $objWriter->writeAttribute('val', '0');
+        $objWriter->endElement();
+
+        $allValues = $subject->getSeries()[0];
+        $allValues = $allValues->getValues();
+        $axisXData = array_shift($allValues); // first element :  all X values
+        $axisXData = $axisXData['values'];
+
+        $includeSheet = true;
+
+        // Write series
+        $seriesIndex = 1;
+        foreach ($allValues as $series) {
+            // c:ser
+            $objWriter->startElement('c:ser');
+            
+            // c:idx
+            $objWriter->startElement('c:idx');
+            $objWriter->writeAttribute('val', $seriesIndex);
+            $objWriter->endElement();
+
+            // c:order
+            $objWriter->startElement('c:order');
+            $objWriter->writeAttribute('val', $seriesIndex);
+            $objWriter->endElement();
+
+            echo "\n".$series['name'];
+            echo $seriesIndex;
+            echo Coordinate::stringFromColumnIndex(1 + $seriesIndex) ;
+
+
+            // c:tx
+            $objWriter->startElement('c:tx');
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex(1 + $seriesIndex) . '$1' : '');
+            echo "\ncoord1 = ".$coords;
+
+                $this->writeSingleValueOrReference($objWriter, $includeSheet, $series['name'], $coords);
+
+    
+            $objWriter->endElement();
+
+           
+
+            // Write X axis data
+
+            // c:xVal
+            $objWriter->startElement('c:xVal');
+            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $axisXData, 'Sheet1!$A$2:$A$' . (1 + count($axisXData)));
+            $objWriter->endElement();
+
+
+            // c:yVal
+            $objWriter->startElement('c:yVal');
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($seriesIndex + 1) . '$2:$' . Coordinate::stringFromColumnIndex($seriesIndex + 1) . '$' . (1 + count($axisXData)) : '');
+            echo "\ncoord2 = ".$coords;
+            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $series['values'], $coords);
+            $objWriter->endElement();
+
+
+            $objWriter->startElement('c:bubbleSize');
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($seriesIndex + 2) . '$2:$' . Coordinate::stringFromColumnIndex($seriesIndex + 2) . '$' . (1 + count($axisXData)) : '');
+            echo "\ncoord3 = ".$coords;
+            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $series['sizes'], $coords);
+            $objWriter->endElement();
+
+
+             
+            $objWriter->endElement(); // c:ser
+
+           
+            ++$seriesIndex;
+            ++$seriesIndex;
+        }
+
+        // c:dLbls
+        $objWriter->startElement('c:dLbls');
+
+
+        // c:showLegendKey
+        $this->writeElementWithValAttribute($objWriter, 'c:showLegendKey', '1');
+
+        // c:showVal
+        $this->writeElementWithValAttribute($objWriter, 'c:showVal', '0');
+
+        // c:showCatName
+        $this->writeElementWithValAttribute($objWriter, 'c:showCatName', '0');
+
+        // c:showSerName
+        $this->writeElementWithValAttribute($objWriter, 'c:showSerName', '0');
+
+        // c:showPercent
+        $this->writeElementWithValAttribute($objWriter, 'c:showPercent', '0');
+
+        $this->writeElementWithValAttribute($objWriter, 'c:showBubbleSize','0');
+
+        $objWriter->endElement();
+
+        // c:bubbleScale
+        $objWriter->startElement('c:bubbleScale');
+        $objWriter->writeAttribute('val', '100');
+        $objWriter->endElement();
+
+        
+        // c:showNegBubbles
+        $objWriter->startElement('c:showNegBubbles');
+        $objWriter->writeAttribute('val', '0');
+        $objWriter->endElement();
+
+  
+
+        // c:axId
+        $objWriter->startElement('c:axId');
+        $objWriter->writeAttribute('val', '52743552');
+        $objWriter->endElement();
+
+        // c:axId
+        $objWriter->startElement('c:axId');
+        $objWriter->writeAttribute('val', '52749440');
+        $objWriter->endElement();
+
+        $objWriter->endElement();
+    }
+
+
     /**
      * Write chart relationships to XML format.
      *
@@ -2303,7 +2444,7 @@ class PptCharts extends AbstractDecoratorWriter
             $crossAxVal = '52743552';
         }
 
-        if ($typeChart instanceof Scatter) {
+        if ($typeChart instanceof Scatter || $typeChart instanceof Bubble) {
             $mainElement = 'c:valAx';
         }
 
