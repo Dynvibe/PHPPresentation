@@ -2300,6 +2300,11 @@ class PptCharts extends AbstractDecoratorWriter
             $crossAxVal = '52743552';
         }
 
+        if ($typeChart instanceof Scatter) {
+            $mainElement = 'c:valAx';
+        }
+
+
         // $mainElement
         $objWriter->startElement($mainElement);
 
