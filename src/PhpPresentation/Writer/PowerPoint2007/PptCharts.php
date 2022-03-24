@@ -2223,40 +2223,40 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->writeAttribute('val', '0');
         $objWriter->endElement();
 
-        $allValues = $subject->getSeries()[0];
-        $allValues = $allValues->getValues();
+       
+        $allValues = $subject->getSeries();
         $axisXData = array_shift($allValues); // first element :  all X values
-        $axisXData = $axisXData['values'];
+        $axisXData = $axisXData->getValues();
 
         $includeSheet = true;
 
+
         // Write series
-        $seriesIndex = 1;
-        foreach ($allValues as $series) {
+        for ($i=0 ; $i < count($allValues) ; $i = $i + 2) {
+            
             // c:ser
             $objWriter->startElement('c:ser');
             
             // c:idx
             $objWriter->startElement('c:idx');
-            $objWriter->writeAttribute('val', $seriesIndex);
+            $objWriter->writeAttribute('val', $i);
             $objWriter->endElement();
 
             // c:order
             $objWriter->startElement('c:order');
-            $objWriter->writeAttribute('val', $seriesIndex);
+            $objWriter->writeAttribute('val', $i);
             $objWriter->endElement();
 
-            echo "\n".$series['name'];
-            echo $seriesIndex;
-            echo Coordinate::stringFromColumnIndex(1 + $seriesIndex) ;
+            echo "\n".$allValues[$i]->getTitle();
+            echo Coordinate::stringFromColumnIndex(1 + $i) ;
 
 
             // c:tx
             $objWriter->startElement('c:tx');
-            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex(1 + $seriesIndex) . '$1' : '');
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex(1 + $i) . '$1' : '');
             echo "\ncoord1 = ".$coords;
 
-                $this->writeSingleValueOrReference($objWriter, $includeSheet, $series['name'], $coords);
+            $this->writeSingleValueOrReference($objWriter, $includeSheet, $allValues[$i]->getTitle(), $coords);
 
     
             $objWriter->endElement();
@@ -2273,25 +2273,20 @@ class PptCharts extends AbstractDecoratorWriter
 
             // c:yVal
             $objWriter->startElement('c:yVal');
-            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($seriesIndex + 1) . '$2:$' . Coordinate::stringFromColumnIndex($seriesIndex + 1) . '$' . (1 + count($axisXData)) : '');
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($i + 1) . '$2:$' . Coordinate::stringFromColumnIndex($i + 1) . '$' . (1 + count($axisXData)) : '');
             echo "\ncoord2 = ".$coords;
-            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $series['values'], $coords);
+            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $allValues[$i]->getValues(), $coords);
             $objWriter->endElement();
 
 
             $objWriter->startElement('c:bubbleSize');
-            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($seriesIndex + 2) . '$2:$' . Coordinate::stringFromColumnIndex($seriesIndex + 2) . '$' . (1 + count($axisXData)) : '');
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($i + 2) . '$2:$' . Coordinate::stringFromColumnIndex($i + 2) . '$' . (1 + count($axisXData)) : '');
             echo "\ncoord3 = ".$coords;
-            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $series['sizes'], $coords);
+            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $allValues[$i+1]->getValues(), $coords);
             $objWriter->endElement();
-
-
              
             $objWriter->endElement(); // c:ser
 
-           
-            ++$seriesIndex;
-            ++$seriesIndex;
         }
 
         // c:dLbls

@@ -3,16 +3,13 @@
 include_once 'Sample_Header.php';
 
 use PhpOffice\PhpPresentation\PhpPresentation;
-use PhpOffice\PhpPresentation\Shape\Chart\Legend;
 use PhpOffice\PhpPresentation\Shape\Chart\Marker;
 use PhpOffice\PhpPresentation\Shape\Chart\Series;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Bubble;
-use PhpOffice\PhpPresentation\Shape\Chart\Type\Scatter;
 use PhpOffice\PhpPresentation\Style\Border;
 use PhpOffice\PhpPresentation\Style\Color;
 use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpPresentation\Style\Shadow;
-use PhpOffice\PhpPresentation\Shape\Chart\Axis;
 
 function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
 {
@@ -27,69 +24,97 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
 	echo date('H:i:s') . ' Generate sample data for chart' . EOL;
 	$seriesData = [
 		[
-			"name" => "X",
-			"values" => [
-				-3,
-				-6,
-				-15,
-			],
-		],
-		[
 			"name" => "Serie_1",
 			"values" => [
-				274,
-				0,
-				0,
-			],
-			"sizes" => [
-				302,
-				0,
-				0,
+                [
+				"x" => -3,
+                "y" => 10,
+                "size" => 5
+                ]
 			],
 		],
-		[
+        [
 			"name" => "Serie_2",
 			"values" => [
-				0,
-				245,
-				0,
+                [
+				"x" => -10,
+                "y" => 30,
+                "size" => 50
+                ]
 			],
-			"sizes" => [
-				0,
-				300,
-				0,
-			],
-		],
-		[
-			"name" => "Serie_3",
-			"values" => [
-				0,
-				0,
-				179,
-			],
-			"sizes" => [
-				0,
-				0,
-				292,
-			],
-		],
+		]
 	];
+
+
 
 	// Create a scatter chart (that should be inserted in a shape)
 	echo date('H:i:s') . ' Create a scatter chart (that should be inserted in a chart shape)' . EOL;
 	$lineChart = new Bubble();
 	$lineChart->setIsSmooth(true);
-	$series = new Series('Downloads', $seriesData);
-	$series->setShowSeriesName(true);
-	$series->getMarker()->setSymbol(Marker::SYMBOL_CIRCLE);
-	$series->getMarker()->getFill()
-		->setFillType(Fill::FILL_SOLID)
-		->setStartColor(new Color('FF6F3510'))
-		->setEndColor(new Color('FF6F3510'));
-	$series->getMarker()->getBorder()->getColor()->setRGB('FF0000');
-	$series->getMarker()->setSize(10);
-	$lineChart->addSeries($series);
 
+    // find all X 
+    $xValues = array();
+    foreach($seriesData as $data) {
+        $values = $data['values'];
+        foreach($values as $value) {
+            if (!in_array($value['x'], $xValues)) {
+                $xValues[] = $value['x'];
+            }
+        }
+    }
+
+    // add X series 
+    $oSeries = new Series("X", $xValues);
+    $oSeries->setShowSeriesName(true);
+    $oSeries->getMarker()->setSymbol(Marker::SYMBOL_CIRCLE);
+    $oSeries->getMarker()->getFill()
+        ->setFillType(Fill::FILL_SOLID)
+        ->setStartColor(new Color('FF6F3510'))
+        ->setEndColor(new Color('FF6F3510'));
+    $oSeries->getMarker()->getBorder()->getColor()->setRGB('FF0000');
+    $oSeries->getMarker()->setSize(10);
+    $lineChart->addSeries($oSeries);
+
+
+    foreach($seriesData as $data) {
+        $values = $data['values'];
+        $yValues = array_fill(0,count($xValues), 0);
+        $sizeValues = array_fill(0,count($xValues), 0);
+
+        foreach($values as $value) {
+            $index = array_search($value['x'], $xValues); 
+            $yValues[$index] = $value['y'];
+            $sizeValues[$index] = $value['size'];
+        }
+
+
+        $oSeries = new Series($data['name'],$yValues);
+        $oSeries->setShowSeriesName(true);
+		$oSeries->getMarker()->setSymbol(Marker::SYMBOL_CIRCLE);
+		$oSeries->getMarker()->getFill()
+			->setFillType(Fill::FILL_SOLID)
+			->setStartColor(new Color('FF6F3510'))
+			->setEndColor(new Color('FF6F3510'));
+		$oSeries->getMarker()->getBorder()->getColor()->setRGB('FF0000');
+		$oSeries->getMarker()->setSize(10);
+		$lineChart->addSeries($oSeries);
+
+        $oSeries = new Series("Size ".$data['name'],$sizeValues);
+        $oSeries->setShowSeriesName(true);
+		$oSeries->getMarker()->setSymbol(Marker::SYMBOL_CIRCLE);
+		$oSeries->getMarker()->getFill()
+			->setFillType(Fill::FILL_SOLID)
+			->setStartColor(new Color('FF6F3510'))
+			->setEndColor(new Color('FF6F3510'));
+		$oSeries->getMarker()->getBorder()->getColor()->setRGB('FF0000');
+		$oSeries->getMarker()->setSize(10);
+		$lineChart->addSeries($oSeries);
+
+    }
+
+
+
+   
 	// Create a shape (chart)
 	echo date('H:i:s') . ' Create a shape (chart)' . EOL;
 	$shape = $currentSlide->createChartShape();
@@ -98,7 +123,8 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
 		->setHeight(550)
 		->setWidth(700)
 		->setOffsetX(120)
-		->setOffsetY(80);
+		->setOffsetY(80)
+		->setIncludeSpreadsheet(true);
 	$shape->setShadow($oShadow);
 	$shape->setFill($oFill);
 	$shape->getBorder()->setLineStyle(Border::LINE_SINGLE);
@@ -110,7 +136,6 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
 	$shape->getLegend()->getBorder()->setLineStyle(Border::LINE_SINGLE);
 	$shape->getLegend()->getFont()->setItalic(true);
 }
-
 
 // Create new PHPPresentation object
 echo date('H:i:s') . ' Create new PHPPresentation object' . EOL;
