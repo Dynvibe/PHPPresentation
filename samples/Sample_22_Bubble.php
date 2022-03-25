@@ -119,13 +119,11 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
             ->setStartColor(new Color($colors[$indexSeries]))
             ->setEndColor(new Color($colors[$indexSeries]));
         $oSeries->getFill()->getStartColor()->setAlpha(50);
-
+ 
+       
         $border = new Border();
         $border->setColor(new Color($colors[$indexSeries]));
-        //$border->setColor(new Color(COLOR::COLOR_RED));
-        
-        $border->setLineWidth(50);
-
+        $border->setLineWidth(2);
         $oSeries->getMarker()->setBorder($border);
 
 
