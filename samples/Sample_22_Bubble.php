@@ -3,6 +3,7 @@
 include_once 'Sample_Header.php';
 
 use PhpOffice\PhpPresentation\PhpPresentation;
+use PhpOffice\PhpPresentation\Shape\Chart\Legend;
 use PhpOffice\PhpPresentation\Shape\Chart\Marker;
 use PhpOffice\PhpPresentation\Shape\Chart\Series;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Bubble;
@@ -69,12 +70,225 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
                 ],
             ],
         ],
+        [
+            "name" => "Serie_4",
+            "values" => [
+                [
+                    "x" => 12,
+                    "y" => 22,
+                    "size" => 5,
+                ],
+                [
+                    "x" => 25,
+                    "y" => 10,
+                    "size" => 10,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_5",
+            "values" => [
+                [
+                    "x" => -54,
+                    "y" => 37,
+                    "size" => 50,
+                ],
+                [
+                    "x" => 0,
+                    "y" => 40,
+                    "size" => 10,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_6",
+            "values" => [
+                [
+                    "x" => 20,
+                    "y" => 17,
+                    "size" => 25,
+                ],
+                [
+                    "x" => 10,
+                    "y" => 72,
+                    "size" => 20,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_7",
+            "values" => [
+                [
+                    "x" => -30,
+                    "y" => 20,
+                    "size" => 5,
+                ],
+                [
+                    "x" => 45,
+                    "y" => 45,
+                    "size" => 10,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_8",
+            "values" => [
+                [
+                    "x" => -10,
+                    "y" => 40,
+                    "size" => 10,
+                ],
+                [
+                    "x" => 10,
+                    "y" => 20,
+                    "size" => 12,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_9",
+            "values" => [
+                [
+                    "x" => 15,
+                    "y" => 70,
+                    "size" => 30,
+                ],
+                [
+                    "x" => 25,
+                    "y" => 70,
+                    "size" => 20,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_10",
+            "values" => [
+                [
+                    "x" => -30,
+                    "y" => 20,
+                    "size" => 15,
+                ],
+                [
+                    "x" => 30,
+                    "y" => 50,
+                    "size" => 20,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_11",
+            "values" => [
+                [
+                    "x" => 12,
+                    "y" => 15,
+                    "size" => 25,
+                ],
+                [
+                    "x" => 0,
+                    "y" => 10,
+                    "size" => 5,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_12",
+            "values" => [
+                [
+                    "x" => 80,
+                    "y" => 70,
+                    "size" => 20,
+                ],
+                [
+                    "x" => 80,
+                    "y" => 100,
+                    "size" => 30,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_13",
+            "values" => [
+                [
+                    "x" => 15,
+                    "y" => 5,
+                    "size" => 5,
+                ],
+                [
+                    "x" => 15,
+                    "y" => 50,
+                    "size" => 20,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_14",
+            "values" => [
+                [
+                    "x" => 27,
+                    "y" => 27,
+                    "size" => 27,
+                ],
+                [
+                    "x" => -27,
+                    "y" => 27,
+                    "size" => 27,
+                ],
+            ],
+        ],
+        [
+            "name" => "Serie_15",
+            "values" => [
+                [
+                    "x" => 45,
+                    "y" => 0,
+                    "size" => 10,
+                ],
+                [
+                    "x" => 10,
+                    "y" => 70,
+                    "size" => 20,
+                ],
+            ],
+        ],
     ];
 
     $colors = [
-        Color::COLOR_DARKGREEN,
-        Color::COLOR_DARKYELLOW,
-        Color::COLOR_BLUE
+        "FF32D1CD",
+		"FF7CB5EC",
+		"FF99c584",
+		"FFffd500",
+		"FFf3a344",
+		"FFe35656",
+		"FFEFBBFF",
+		"FFA60CA6",
+		"FF0457a9",
+		"FFFF0081",
+		"FF8D864A",
+		"FF6c4111",
+		"FFd9d4a5",
+		"FF232323",
+		"FF460446",
+		"FF11520d", 
+		"FFF1C40F",
+		"FFA0D6B4",
+		"FF36802D",
+		"FF243F5B",
+		"FF8D864A",
+		"FF845422",
+		"FF4BCC2E",
+		"FFBE29EC",
+		"FFFF0081",
+		"FF0C457D",
+		"FF003366",
+		"FFFFDAB9",
+		"FFDAA520",
+		"FFFF6666",
+		"FF66CDAA",
+		"FFFFF68F",
+		"FFB0E0E6",
+		"FF8A2BE2",
+		"FF696966",
+		"FF000000",
     ];
 
 
@@ -152,10 +366,13 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
     $shape->getTitle()->setText('PHPPresentation Daily Downloads');
     $shape->getTitle()->getFont()->setItalic(true);
     $shape->getPlotArea()->setType($lineChart);
-    $shape->getView3D()->setRotationX(30);
-    $shape->getView3D()->setPerspective(30);
-    $shape->getLegend()->getBorder()->setLineStyle(Border::LINE_SINGLE);
-    $shape->getLegend()->getFont()->setItalic(true);
+
+    $shape->getLegend()->setPosition(Legend::POSITION_BOTTOM);
+    $shape->getLegend()->getBorder()->setLineStyle(Border::LINE_NONE);
+
+    $shape->getLegend()
+        ->setWidth(700)
+        ->setHeight(100);
 }
 
 // Create new PHPPresentation object
