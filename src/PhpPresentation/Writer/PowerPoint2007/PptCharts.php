@@ -2242,8 +2242,8 @@ class PptCharts extends AbstractDecoratorWriter
             $objWriter->writeAttribute('val', $i);
             $objWriter->endElement();
 
-            echo "\n" . $allValues[$i]->getTitle();
-            echo Coordinate::stringFromColumnIndex(2 + $i);
+            //echo "\n" . $allValues[$i]->getTitle();
+            //echo Coordinate::stringFromColumnIndex(2 + $i);
 
             // c:tx
             $objWriter->startElement('c:tx');
