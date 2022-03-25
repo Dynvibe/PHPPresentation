@@ -2279,11 +2279,7 @@ class PptCharts extends AbstractDecoratorWriter
             $this->writeSeriesMarker($objWriter, $allValues[$i]->getMarker());
             $objWriter->endElement();
 
-            var_dump($allValues[$i]->getMarker());
-
-            
-            
-
+            //var_dump($allValues[$i]->getMarker());
 
             // c:dLbls
             $objWriter->startElement('c:dLbls');
