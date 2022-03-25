@@ -16,7 +16,7 @@
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace PhpOffice\PhpPresentation\Writer\PowerPoint2007;
 
@@ -32,15 +32,15 @@ use PhpOffice\PhpPresentation\Shape\Chart\Legend;
 use PhpOffice\PhpPresentation\Shape\Chart\PlotArea;
 use PhpOffice\PhpPresentation\Shape\Chart\Title;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Area;
-use PhpOffice\PhpPresentation\Shape\Chart\Type\Bar;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Bar3D;
+use PhpOffice\PhpPresentation\Shape\Chart\Type\Bar;
+use PhpOffice\PhpPresentation\Shape\Chart\Type\Bubble;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Doughnut;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Line;
-use PhpOffice\PhpPresentation\Shape\Chart\Type\Pie;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Pie3D;
+use PhpOffice\PhpPresentation\Shape\Chart\Type\Pie;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Radar;
 use PhpOffice\PhpPresentation\Shape\Chart\Type\Scatter;
-use PhpOffice\PhpPresentation\Shape\Chart\Type\Bubble;
 use PhpOffice\PhpPresentation\Style\Border;
 use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -246,8 +246,8 @@ class PptCharts extends AbstractDecoratorWriter
         $spreadsheet->getProperties()
             ->setCreator(
                 $presentation->getDocumentProperties()->getCreator())->setLastModifiedBy(
-                    $presentation->getDocumentProperties()->getLastModifiedBy()
-                )
+            $presentation->getDocumentProperties()->getLastModifiedBy()
+        )
             ->setTitle($title);
 
         // Add chart data
@@ -526,7 +526,7 @@ class PptCharts extends AbstractDecoratorWriter
             $this->writeTypeRadar($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
         } elseif ($chartType instanceof Scatter) {
             $this->writeTypeScatter($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
-        }  elseif ($chartType instanceof Bubble) {
+        } elseif ($chartType instanceof Bubble) {
             $this->writeTypeBubble($objWriter, $chartType, $chart->hasIncludedSpreadsheet());
         } else {
             throw new UndefinedChartTypeException();
@@ -2206,7 +2206,7 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->endElement();
     }
 
-     /**
+    /**
      * Write Type Bubble
      *
      * @param XMLWriter $objWriter
@@ -2223,20 +2223,15 @@ class PptCharts extends AbstractDecoratorWriter
         $objWriter->writeAttribute('val', '0');
         $objWriter->endElement();
 
-       
         $allValues = $subject->getSeries();
         $axisXData = array_shift($allValues); // first element :  all X values
         $axisXData = $axisXData->getValues();
 
-        $includeSheet = true;
-
-
         // Write series
-        for ($i=0 ; $i < count($allValues) ; $i = $i + 2) {
-            
+        for ($i = 0; $i < count($allValues); $i = $i + 2) { // +2 -> Y values and size values
             // c:ser
             $objWriter->startElement('c:ser');
-            
+
             // c:idx
             $objWriter->startElement('c:idx');
             $objWriter->writeAttribute('val', $i);
@@ -2247,83 +2242,67 @@ class PptCharts extends AbstractDecoratorWriter
             $objWriter->writeAttribute('val', $i);
             $objWriter->endElement();
 
-            echo "\n".$allValues[$i]->getTitle();
-            echo Coordinate::stringFromColumnIndex(1 + $i) ;
-
+            echo "\n" . $allValues[$i]->getTitle();
+            echo Coordinate::stringFromColumnIndex(2 + $i);
 
             // c:tx
             $objWriter->startElement('c:tx');
-            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex(1 + $i) . '$1' : '');
-            echo "\ncoord1 = ".$coords;
-
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex(2 + $i) . '$1' : '');
             $this->writeSingleValueOrReference($objWriter, $includeSheet, $allValues[$i]->getTitle(), $coords);
-
-    
             $objWriter->endElement();
-
-           
-
-            // Write X axis data
 
             // c:xVal
             $objWriter->startElement('c:xVal');
             $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $axisXData, 'Sheet1!$A$2:$A$' . (1 + count($axisXData)));
             $objWriter->endElement();
 
-
             // c:yVal
             $objWriter->startElement('c:yVal');
-            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($i + 1) . '$2:$' . Coordinate::stringFromColumnIndex($i + 1) . '$' . (1 + count($axisXData)) : '');
-            echo "\ncoord2 = ".$coords;
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($i + 2) . '$2:$' . Coordinate::stringFromColumnIndex($i + 2) . '$' . (1 + count($axisXData)) : '');
             $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $allValues[$i]->getValues(), $coords);
             $objWriter->endElement();
 
-
+            // c:bubbleSize
             $objWriter->startElement('c:bubbleSize');
-            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($i + 2) . '$2:$' . Coordinate::stringFromColumnIndex($i + 2) . '$' . (1 + count($axisXData)) : '');
-            echo "\ncoord3 = ".$coords;
-            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $allValues[$i+1]->getValues(), $coords);
+            $coords = ($includeSheet ? 'Sheet1!$' . Coordinate::stringFromColumnIndex($i + 3) . '$2:$' . Coordinate::stringFromColumnIndex($i + 3) . '$' . (1 + count($axisXData)) : '');
+            $this->writeMultipleValuesOrReference($objWriter, $includeSheet, $allValues[$i + 1]->getValues(), $coords);
             $objWriter->endElement();
-             
+
+            // c:dLbls
+            $objWriter->startElement('c:dLbls');
+
+            // c:showLegendKey
+            $this->writeElementWithValAttribute($objWriter, 'c:showLegendKey', $allValues[$i]->hasShowLegendKey() ? '1' : '0');
+
+            // c:showVal
+            $this->writeElementWithValAttribute($objWriter, 'c:showVal', $allValues[$i]->hasShowValue() ? '1' : '0');
+
+            // c:showCatName
+            $this->writeElementWithValAttribute($objWriter, 'c:showCatName', $allValues[$i]->hasShowCategoryName() ? '1' : '0');
+
+            // c:showSerName
+            $this->writeElementWithValAttribute($objWriter, 'c:showSerName', $allValues[$i]->hasShowSeriesName() ? '1' : '0');
+
+            // c:showPercent
+            $this->writeElementWithValAttribute($objWriter, 'c:showPercent', $allValues[$i]->hasShowPercentage() ? '1' : '0');
+
+            $this->writeElementWithValAttribute($objWriter, 'c:showBubbleSize', $allValues[$i]->hasShowValue() ? '1' : '0');
+
+            $objWriter->endElement(); //dLbls
+
             $objWriter->endElement(); // c:ser
 
         }
-
-        // c:dLbls
-        $objWriter->startElement('c:dLbls');
-
-
-        // c:showLegendKey
-        $this->writeElementWithValAttribute($objWriter, 'c:showLegendKey', '1');
-
-        // c:showVal
-        $this->writeElementWithValAttribute($objWriter, 'c:showVal', '0');
-
-        // c:showCatName
-        $this->writeElementWithValAttribute($objWriter, 'c:showCatName', '0');
-
-        // c:showSerName
-        $this->writeElementWithValAttribute($objWriter, 'c:showSerName', '0');
-
-        // c:showPercent
-        $this->writeElementWithValAttribute($objWriter, 'c:showPercent', '0');
-
-        $this->writeElementWithValAttribute($objWriter, 'c:showBubbleSize','0');
-
-        $objWriter->endElement();
 
         // c:bubbleScale
         $objWriter->startElement('c:bubbleScale');
         $objWriter->writeAttribute('val', '100');
         $objWriter->endElement();
 
-        
         // c:showNegBubbles
         $objWriter->startElement('c:showNegBubbles');
         $objWriter->writeAttribute('val', '0');
         $objWriter->endElement();
-
-  
 
         // c:axId
         $objWriter->startElement('c:axId');
@@ -2337,7 +2316,6 @@ class PptCharts extends AbstractDecoratorWriter
 
         $objWriter->endElement();
     }
-
 
     /**
      * Write chart relationships to XML format.
