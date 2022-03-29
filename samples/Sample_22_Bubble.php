@@ -370,9 +370,7 @@ function fnSlide_Bubble(PhpPresentation $objPHPPresentation)
     $shape->getLegend()->setPosition(Legend::POSITION_BOTTOM);
     $shape->getLegend()->getBorder()->setLineStyle(Border::LINE_NONE);
 
-    $shape->getLegend()
-        ->setWidth(700)
-        ->setHeight(100);
+    $shape->getLegend()->setWidth(1);
 }
 
 // Create new PHPPresentation object
