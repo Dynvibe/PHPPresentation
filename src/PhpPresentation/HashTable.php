@@ -31,7 +31,7 @@ class HashTable
      * @var array<string, ComparableInterface>
      */
     public $items = [];
-
+    //just trying push
     /**
      * HashTable key map.
      *
