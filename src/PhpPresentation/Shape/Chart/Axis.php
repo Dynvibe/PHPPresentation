@@ -41,6 +41,8 @@ class Axis implements ComparableInterface
     public const CROSSES_AUTO = 'autoZero';
     public const CROSSES_MIN = 'min';
     public const CROSSES_MAX = 'max';
+    //fix issue 758 https://github.com/PHPOffice/PHPPresentation/issues/758
+    public const DEFAULT_FORMAT_CODE = 'general';
 
     /**
      * Title.
@@ -59,7 +61,8 @@ class Axis implements ComparableInterface
      *
      * @var string
      */
-    private $formatCode = '';
+    //fix issue 758 https://github.com/PHPOffice/PHPPresentation/issues/758
+    private $formatCode = self::DEFAULT_FORMAT_CODE;
 
     /**
      * Font.
